@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from requests import Session
 from pbipy.resources import Resource
 from pbipy.utils import remove_no_values
@@ -50,7 +52,7 @@ class Dataflow(Resource):
         self,
         notify_option: str,
         process_type: str = None,
-    ) -> None:
+    ) -> datetime:
         """
         Trigger a refresh of the Dataflow.
 
@@ -62,13 +64,21 @@ class Dataflow(Resource):
         `process_type` : `str`, optional
             The type of refresh process to use.
 
+        Returns
+        -------
+        `datetime`
+            Approximate UTC Timestamp of Request
+
         """
 
         resource = self.base_path + "/refreshes"
         payload = {"notifyOption": notify_option}
         params = {"processType": process_type}
 
+        request_timestamp = datetime.utcnow()
         self.post(resource, self.session, payload=payload, params=params)
+
+        return request_timestamp
 
     def transactions(
         self,
