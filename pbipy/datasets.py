@@ -244,16 +244,16 @@ class Dataset(Resource):
         return self.get_raw(resource, self.session)
 
     def refresh(
-        self,
-        notify_option: str,
-        apply_refresh_policy: bool = None,
-        commit_mode: str = None,
-        effective_date: str = None,
-        max_parallelism: int = None,
-        objects: list[dict] = None,
-        retry_count: int = None,
-        type: str = None,
-    ) -> None:
+            self,
+            notify_option: str,
+            apply_refresh_policy: bool = None,
+            commit_mode: str = None,
+            effective_date: str = None,
+            max_parallelism: int = None,
+            objects: list[dict] = None,
+            retry_count: int = None,
+            type: str = None,
+    ) -> str:
         """
         Trigger a refresh of the dataset. An enhanced refresh is triggered
         only if a request option other than `notify_option` is set.
@@ -294,7 +294,12 @@ class Dataset(Resource):
         -----
         See here for request options in greater detail:
         https://learn.microsoft.com/en-us/rest/api/power-bi/datasets/refresh-dataset#definitions
-        
+
+        Returns
+        -------
+        `str`
+            Response Header RequestId value
+
         """
 
         refresh_request = {
@@ -311,7 +316,10 @@ class Dataset(Resource):
         prepared_request = remove_no_values(refresh_request)
         resource = self.base_path + "/refreshes"
 
-        self.post(resource, self.session, prepared_request)
+        response = self.post(resource, self.session, prepared_request)
+        request_id = response.headers["RequestId"]
+
+        return request_id
 
     def refresh_details(
         self,
